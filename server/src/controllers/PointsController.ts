@@ -5,7 +5,7 @@ class PointsController {
 
     async create(request: Request, response: Response){
         const { 
-            name, email, whatsapp, latitude, longitude, city, uf, number, items
+            name, email, whatsapp, latitude, longitude, city, uf, items
         } = request.body;
     
         const trx = await knex.transaction();
@@ -19,7 +19,6 @@ class PointsController {
             longitude,
             city,
             uf,
-            number
         }
         
         const inserted_ids = await trx('points').insert(point);
@@ -34,7 +33,6 @@ class PointsController {
         await trx('point_items').insert(pointItems);
         
         await trx.commit();
-
         return response.json({
             id: point_id,
             ...point,
@@ -58,18 +56,17 @@ class PointsController {
     async index (request: Request, response: Response){
         const {city, uf, items} = request.query;
 
-        const pasredItems = String(items)
+        const parsedItems = String(items)
             .split(',')
             .map(item => Number(item.trim()));
         
         const points = await knex('points')
             .join('point_items', 'points.id', '=', 'point_items.point_id')
-            .whereIn('point_items.item_id', pasredItems)
+            .whereIn('point_items.item_id', parsedItems)
             .where('city', String(city))
             .where('uf', String(uf))
             .distinct()
             .select('points.*');
-
         return response.json(points);
     }
 
