@@ -4,7 +4,8 @@ import { RectButton } from 'react-native-gesture-handler';
 import { Feather as Icon } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
-import { Picker } from '@react-native-community/picker';
+import { Dropdown } from 'react-native-material-dropdown';
+
 
 
 interface UF{
@@ -24,13 +25,13 @@ const Home = () =>{
 
     const navigation = useNavigation();
 
-    
-    
+
     useEffect (()=> {
       axios.get<UF[]>(`https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome`).then(response =>{
          const ufInitials = response.data.map(uf => uf.sigla);
          setUfs(ufInitials);
       })
+      
     }, []);
 
     useEffect (() => {
@@ -47,14 +48,16 @@ const Home = () =>{
         selectedCity
       });
     }
+    
 
     return (
+
         <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS == 'ios' ? 'padding' : undefined}>
         <ImageBackground 
             source={require('../../assets/home-background.png')}
             style={styles.container}
             imageStyle={{width: 274, height: 368}}>
-
+              
             <View style={styles.main}>
                 <Image source={require('../../assets/logo.png')} />
                 <Text style={styles.title}>Seu marketplace de coleta de resíduos</Text>
@@ -62,27 +65,13 @@ const Home = () =>{
             </View>
 
             <View style={styles.footer}>
-                <Picker 
-                  selectedValue={selectedUF}
-                  style={styles.input}
-                  onValueChange={(itemValue, itemPosition) =>  setSelectedUF(itemValue as string) }>
+            
+            <Dropdown label="Selecione um Estado" data={ ufs.map(uf => ({value: uf})) } value={selectedUF} onChangeText={(value) => {setSelectedUF(value)}} />
+            
 
-                  <Picker.Item label="Selecione um Estado" value="0" />
-                  {ufs.map(uf =>( 
-                    <Picker.Item label={uf} value={uf} />
-                ))}
-                </Picker>
+            <Dropdown label="Selecione uma cidade" data={ citys.map(city =>({value: city}))} value={selectedCity} onChangeText={(value) => {setSelectedCity(value)}} />
 
-                <Picker 
-                  selectedValue={selectedCity}
-                  style={styles.input}
-                  onValueChange={(itemValue, itemPosition) =>  setSelectedCity(itemValue as string) }>
-                  <Picker.Item label="Selecione uma Cidade" value="0" />
-                  {citys.map(city =>( 
-                    <Picker.Item label={city} value={city} />
-                ))}
-                </Picker>
-
+            
                 <RectButton style={styles.button} onPress={handleNavigationToPoints} >
                     <View style={styles.buttonIcon}>
                         <Icon name="log-in" color="#FFF" size={24}/>

@@ -12,13 +12,4 @@ app.use(routes);
 
 app.use('/uploads', express.static(path.resolve(__dirname, '..', 'uploads')));
 
-const users = [
-    'Diego',
-    'Andrei',
-    'Tonico',
-    'Alfredo',
-    'Judit'
-];
-
-
 app.listen(3333);
